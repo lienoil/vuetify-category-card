@@ -28,8 +28,12 @@
         <radio v-model="selected" :list="list" :label="radioLabel"></radio>
       </template>
     </v-card-text>
-    <v-card-actions>
 
+    <v-card-actions>
+      <slot :item="{selected}">
+        <input type="hidden" :name="`${name}-stringify`" :value="JSON.stringify(selected)">
+        <input type="hidden" :name="name" :value="selected">
+      </slot>
     </v-card-actions>
   </v-card>
 </template>
@@ -47,6 +51,7 @@
     props: {
       multiple: { type: Boolean, default: true },
       radioLabel: { type: String, default: 'None' },
+      icon: { type: String, default: 'category' },
       icon: { type: String, default: 'fa-leaf' },
       label: { type: String, default: 'Category' },
       list: { type: Array, default: () => { return [] } },
