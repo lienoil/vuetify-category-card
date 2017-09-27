@@ -1,7 +1,7 @@
 {
   "name": "vuetify-category-card",
   "description": "A Vuetify Component for Category Listing",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "John Lioneil Dionisio <john.dionisio1@gmail.com>",
   "main": "src/index.js",
   "scripts": {
