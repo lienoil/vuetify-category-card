@@ -41,6 +41,9 @@
     watch: {
       'list': function (value) {
         this.dataset.items = value
+      },
+      'dataset.selected': function (value) {
+        this.$emit('input', value)
       }
     }
   }

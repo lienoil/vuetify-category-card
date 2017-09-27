@@ -8,10 +8,10 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn @click.stop="searchform.model = !searchform.model" icon><v-icon>search</v-icon></v-btn>
+      <v-btn v-if="search" @click.stop="searchform.model = !searchform.model" icon><v-icon>search</v-icon></v-btn>
     </v-toolbar>
 
-    <v-slide-y-transition>
+    <v-slide-y-transition v-if="search">
       <v-card-actions v-show="searchform.model">
         <v-text-field
           solo
@@ -51,8 +51,9 @@
     props: {
       multiple: { type: Boolean, default: true },
       radioLabel: { type: String, default: 'None' },
-      icon: { type: String, default: 'category' },
+      name: { type: String, default: 'category' },
       icon: { type: String, default: 'fa-leaf' },
+      search: { type: Boolean, default: false },
       label: { type: String, default: 'Category' },
       list: { type: Array, default: () => { return [] } },
     },

@@ -4,7 +4,11 @@
       <v-container fluid grid-list-lg>
         <v-layout row wrap>
           <v-flex sm4>
-            <vue-component label="Tags" :list="[{id:4, icon:'fa-leaf',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}]"></vue-component>
+            <vue-component :multiple="false" label="Tags" :list="[{id:4, icon:'fa-leaf',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}]">
+              <template scope="item">
+                <span v-html="item"></span>
+              </template>
+            </vue-component>
           </v-flex>
         </v-layout>
       </v-container>
