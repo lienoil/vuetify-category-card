@@ -4,7 +4,7 @@
       <v-container fluid grid-list-lg>
         <v-layout row wrap>
           <v-flex sm4>
-            <vue-component :multiple="false" label="Tags" :list="[{id:4, icon:'fa-leaf',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}]">
+            <vue-component v-model="msg" :multiple="false" label="Tags" :list="[{id:4, icon:'fa-leaf',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}]">
               <template scope="item">
                 <span v-html="item"></span>
               </template>
@@ -24,7 +24,7 @@ export default {
   components: { 'vue-component': Component },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: JSON.stringify({id:4, icon:'fa-leaf',name:'Wololo'})
     }
   }
 }

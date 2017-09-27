@@ -1,9 +1,7 @@
 <template>
   <div>
-    <v-checkbox v-model="dataset.selected" hide-details color="primary" v-for="(item, i) in list"
-      :label="item.name" :key="i" :value="item"></v-checkbox>
-
-    <slot :item="dataset.selected"></slot>
+    <v-checkbox v-model="dataset.selected" hide-details color="primary" v-for="(item, i) in dataset.items"
+      :label="item.name" :key="i" :value="JSON.stringify(item)"></v-checkbox>
   </div>
 </template>
 
@@ -18,7 +16,7 @@
       label: { type: String, default: 'None' },
       mandatory: { type: Boolean, default: false },
       multiple: { type: Boolean, default: false },
-      selected: { type: String, default: '' },
+      selected: null,
     },
     data () {
       return {
@@ -37,6 +35,9 @@
     watch: {
       'list': function (value) {
         this.dataset.items = value
+      },
+      'selected': function (value) {
+        this.dataset.selected = value
       },
       'dataset.selected': function (value) {
         this.$emit('input', value)

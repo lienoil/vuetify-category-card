@@ -30,8 +30,8 @@
     </v-card-text>
 
     <v-card-actions>
-      <slot :item="{selected}">
-        <input type="hidden" :name="`${name}-stringify`" :value="JSON.stringify(selected)">
+      <slot :item="selected">
+        <input type="hidden" :name="`${name}_string`" :value="JSON.stringify(selected)">
         <input type="hidden" :name="name" :value="selected">
       </slot>
     </v-card-actions>
@@ -48,7 +48,11 @@
       Radio,
       Checkbox
     },
+    model: {
+      prop: 'content'
+    },
     props: {
+      content: null,
       multiple: { type: Boolean, default: true },
       radioLabel: { type: String, default: 'None' },
       name: { type: String, default: 'category' },
@@ -59,7 +63,7 @@
     },
     data () {
       return {
-        selected: '',
+        selected: null,
         searchform: {
           model: false,
           searchables: []
@@ -73,6 +77,7 @@
       //
     },
     mounted () {
+      this.selected = this.content
       this.dataset.items = this.list
     },
     watch: {
@@ -81,6 +86,12 @@
       },
       'searchform.query': function (value) {
         this.$emit('search', value, this.list)
+      },
+      'content': function (value) {
+        this.selected = value
+      },
+      'selected': function (value) {
+        this.$emit('input', value)
       }
     }
   }
