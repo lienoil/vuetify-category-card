@@ -1,7 +1,14 @@
 <template>
   <div>
-    <v-checkbox v-model="dataset.selected" hide-details color="primary" v-for="(item, i) in dataset.items"
-      :label="item.name" :key="i" :value="JSON.stringify(item)"></v-checkbox>
+    <v-checkbox
+      :key="i"
+      :label="item.name"
+      :value="JSON.stringify(item)"
+      color="primary"
+      hide-details
+      v-for="(item, i) in dataset.items"
+      v-model="dataset.selected"
+    ></v-checkbox>
   </div>
 </template>
 

@@ -22,19 +22,26 @@
 
     <v-card-text class="mb-1 content--scrollable content--bordered">
       <template v-if="multiple">
-        <checkbox v-model="selected" :list="list"></checkbox>
+        <checkbox v-model="selected" :list="dataset.items"></checkbox>
       </template>
       <template v-else>
-        <radio v-model="selected" :list="list" :label="radioLabel"></radio>
+        <radio v-model="selected" :list="dataset.items" :label="radioLabel"></radio>
       </template>
     </v-card-text>
 
-    <v-card-actions>
-      <slot :item="selected">
-        <input type="hidden" :name="`${name}_string`" :value="JSON.stringify(selected)">
-        <input type="hidden" :name="name" :value="selected">
+    <v-card-text>
+      <slot name="footer" :props="{save, dataset}">
+        <v-text-field hide-details v-model="dataset.item" :label="`Add ${label}`"></v-text-field>
       </slot>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn class="elevation-1 accent white--text" ripple @click.stop="save" v-html="addLabel"></v-btn>
     </v-card-actions>
+    <slot :items="selected">
+      <input type="hidden" :name="`${name}_string`" :value="JSON.stringify(selected)">
+      <input type="hidden" :name="name" :value="selected">
+    </slot>
   </v-card>
 </template>
 
@@ -53,12 +60,14 @@
     },
     props: {
       content: null,
-      multiple: { type: Boolean, default: true },
+      multiple: { type: Boolean, default: false },
       radioLabel: { type: String, default: 'None' },
+      addLabel: { type: String, default: 'Add' },
       name: { type: String, default: 'category' },
       icon: { type: String, default: 'fa-leaf' },
       search: { type: Boolean, default: false },
       label: { type: String, default: 'Category' },
+      urls: { type: Object, default: () => { return {} } },
       list: { type: Array, default: () => { return [] } },
     },
     data () {
@@ -69,21 +78,30 @@
           searchables: []
         },
         dataset: {
-          items: []
+          items: [],
+          item: null,
         },
       }
     },
     methods: {
-      //
+      save () {
+        if (this.dataset.item == null || this.dataset.item == "") {
+          return false
+        }
+
+        this.dataset.items.push({name: this.dataset.item})
+        this.dataset.item = null
+        // this.selected = this.dataset.items
+      }
     },
     mounted () {
       this.selected = this.content
       this.dataset.items = this.list
     },
     watch: {
-      'list': function (value) {
-        this.dataset.items = value
-      },
+      // 'content': function (value) {
+      //   this.selected = value
+      // },
       'searchform.query': function (value) {
         this.$emit('search', value, this.list)
       },
