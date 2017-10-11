@@ -4,15 +4,27 @@
       <v-container fluid grid-list-lg>
         <v-layout row wrap>
           <v-flex sm4>
-            <vue-component v-model="msg" icon="fa-tag" label="Category" :list="[{id:4, icon:'fa-tag',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}]">
-            </vue-component>
-            <span v-html="msg"></span>
-          </v-flex>
-          <v-flex sm4>
-            <vue-component v-model="msgs" multiple icon="fa-tags" label="Tags" :list="[{id:4, icon:'fa-tags',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}]">
+            <vue-component input-text="icon" :multiple="false" v-model="msg" icon="fa-tag" label="Category" :list="listRadio">
               <!-- <template scope="item">
                 <span v-html="item"></span>
               </template> -->
+            </vue-component>
+            <span v-html="msg"></span>
+          </v-flex>
+
+          <v-flex sm4>
+            <vue-component multiple input-value="id" v-model="msgs" :list="list" icon="fa-tags" label="Tags">
+              <template slot="form" scope="{props}">
+                <v-card-text>
+                  <v-text-field hide-details v-model="props.dataset.item.id" label="Add ID"></v-text-field>
+                  <v-text-field hide-details v-model="props.dataset.item.name" label="Add Name"></v-text-field>
+                </v-card-text>
+                <span v-html="props"></span>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn class="elevation-1 accent white--text" ripple @click.stop="props.save">Save</v-btn>
+                </v-card-actions>
+              </template>
             </vue-component>
             <span v-html="msgs"></span>
           </v-flex>
@@ -30,8 +42,10 @@ export default {
   components: { 'vue-component': Component },
   data () {
     return {
-      msg: JSON.stringify({id:4, icon:'fa-leaf',name:'Wololo'}),
-      msgs: [JSON.stringify({id:4, icon:'fa-leaf',name:'Wololo'})],
+      list: [{id:100, icon:'fa-push',name:'Push'},{id:4, icon:'fa-tag',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}],
+      listRadio: [{id:100, icon:'fa-push',name:'Push'},{id:4, icon:'fa-tag',name:'Wololo'}, {id:1, icon:'edit',name:'Yu'},{id:2, icon:'perm_media',name:'Lo'}],
+      msg: 'Push',
+      msgs: [4],
     }
   }
 }

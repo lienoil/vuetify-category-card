@@ -9,7 +9,22 @@
       <v-spacer></v-spacer>
 
       <v-btn v-if="search" @click.stop="searchform.model = !searchform.model" icon><v-icon>search</v-icon></v-btn>
+      <v-btn icon @click.stop="addform.model = !addform.model"><v-icon>{{ !addform.model ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon></v-btn>
     </v-toolbar>
+
+    <v-slide-y-transition>
+      <v-card flat v-show="addform.model">
+        <slot name="form" :props="{dataset, save: save }">
+          <v-card-text>
+            <v-text-field :error-messages="dataset.errors[inputValue]" hide-details v-model="dataset.item[inputValue]" :label="`Add ${label}`"></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn class="elevation-1 accent white--text" ripple @click.stop="save" v-html="addLabel"></v-btn>
+          </v-card-actions>
+        </slot>
+      </v-card>
+    </v-slide-y-transition>
 
     <v-slide-y-transition v-if="search">
       <v-card-actions v-show="searchform.model">
@@ -20,27 +35,30 @@
       </v-card-actions>
     </v-slide-y-transition>
 
-    <v-card-text class="mb-1 content--scrollable content--bordered">
+    <v-divider></v-divider>
+
+    <v-card-text class="content--scrollable">
       <template v-if="multiple">
-        <checkbox v-model="selected" :list="dataset.items"></checkbox>
+        <checkbox v-model="selected" :list="dataset.items" :input-text="inputText" :input-value="inputValue"></checkbox>
       </template>
       <template v-else>
-        <radio v-model="selected" :list="dataset.items" :label="radioLabel"></radio>
+        <radio
+          :label="radioLabel"
+          :list="dataset.items"
+          :mandatory="mandatory"
+          v-model="selected"
+          :input-text="inputText"
+          :input-value="inputValue"
+        ></radio>
       </template>
     </v-card-text>
 
-    <v-card-text>
-      <slot name="footer" :props="{save, dataset}">
-        <v-text-field hide-details v-model="dataset.item" :label="`Add ${label}`"></v-text-field>
-      </slot>
-    </v-card-text>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn class="elevation-1 accent white--text" ripple @click.stop="save" v-html="addLabel"></v-btn>
-    </v-card-actions>
     <slot :items="selected">
-      <input type="hidden" :name="`${name}_string`" :value="JSON.stringify(selected)">
-      <input type="hidden" :name="name" :value="selected">
+      <v-divider></v-divider>
+      <v-footer>
+        <input type="hidden" :name="`${name}_string`" :value="JSON.stringify(selected)">
+        <input type="hidden" :name="name" :value="selected">
+      </v-footer>
     </slot>
   </v-card>
 </template>
@@ -59,16 +77,20 @@
       prop: 'content'
     },
     props: {
-      content: null,
-      multiple: { type: Boolean, default: false },
-      radioLabel: { type: String, default: 'None' },
       addLabel: { type: String, default: 'Add' },
-      name: { type: String, default: 'category' },
+      content: null,
+      errors: { type: Array, default: () => { return [] } },
       icon: { type: String, default: 'fa-leaf' },
-      search: { type: Boolean, default: false },
+      inputText: { type: String, default: 'name' },
+      inputValue: { type: String, default: 'name' },
       label: { type: String, default: 'Category' },
-      urls: { type: Object, default: () => { return {} } },
       list: { type: Array, default: () => { return [] } },
+      mandatory: { type: Boolean, default: false },
+      multiple: { type: Boolean, default: false },
+      name: { type: String, default: 'category' },
+      radioLabel: { type: String, default: 'None' },
+      search: { type: Boolean, default: false },
+      urls: { type: Object, default: () => { return {} } },
     },
     data () {
       return {
@@ -79,24 +101,77 @@
         },
         dataset: {
           items: [],
-          item: null,
+          item: { name: '' },
+          errors: [],
+        },
+        addform: {
+          model: false
         },
       }
     },
     methods: {
       save () {
-        if (this.dataset.item == null || this.dataset.item == "") {
-          return false
-        }
+        let self = this
 
-        this.dataset.items.push({name: this.dataset.item})
-        this.dataset.item = null
-        // this.selected = this.dataset.items
+        this.post().then((data) => {
+          console.log("pooooooo", data)
+          // if (! response.ok) {
+          //   self.dataset.errors = data.item
+          // }
+
+          self.refresh()
+          self.$emit('post', self.dataset, data.item)
+        }, (data) => {
+          console.log('err', data)
+        })
+
+        this.$emit('save', this.dataset)
+      },
+
+      refresh () {
+        let self = this
+
+        this.dataset.item = {}
+        this.get()
+        this.$emit('refresh', this.dataset)
+      },
+
+      get () {
+        let self = this
+
+        this.$http.get(this.urls.GET).then((response) => {
+          let items = response.body
+          self.dataset.items = items
+          self.$emit('get', self.dataset, items)
+        })
+      },
+
+      post () {
+        let self = this
+
+        return new Promise((resolve, reject) => {
+          self.$http.post(self.urls.POST, self.dataset.item).then((response) => {
+            let item = response.body
+            resolve({item, response})
+          }, (response) => {
+            self.dataset.errors = response.body
+            reject({response})
+          })
+        })
       }
     },
     mounted () {
+      let self = this
       this.selected = this.content
       this.dataset.items = this.list
+
+      this.dataset.item = this.dataset.items[0]
+      for (let i in this.dataset.item) {
+        this.dataset.item[i] = ""
+      }
+
+      this.dataset.errors = this.errors
+      this.get()
     },
     watch: {
       // 'content': function (value) {

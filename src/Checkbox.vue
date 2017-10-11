@@ -2,8 +2,9 @@
   <div>
     <v-checkbox
       :key="i"
-      :label="item.name"
-      :value="JSON.stringify(item)"
+      :label="item[inputText]"
+      :value="dataset.items[i][inputValue]"
+      :input-value="inputValue"
       color="primary"
       hide-details
       v-for="(item, i) in dataset.items"
@@ -23,6 +24,8 @@
       label: { type: String, default: 'None' },
       mandatory: { type: Boolean, default: false },
       multiple: { type: Boolean, default: false },
+      inputValue: { type: String, default: 'name' },
+      inputText: { type: String, default: 'name' },
       selected: null,
     },
     data () {
@@ -38,6 +41,7 @@
     },
     mounted () {
       this.dataset.items = this.list
+      this.dataset.selected = this.selected
     },
     watch: {
       'list': function (value) {
